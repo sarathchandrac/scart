@@ -18,6 +18,9 @@ speed-measure-plugin.json
 /.idea
 .project
 .classpath
+.*
+firebase/
+firebase.json
 .c9/
 *.launch
 .settings/
