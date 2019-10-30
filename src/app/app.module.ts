@@ -29,7 +29,10 @@ import { AdminAuthGaurd } from './admin/admin-auth-gaurd.service'
 import { ProductService } from './product.service'
 import { ProductFormComponent } from './admin/product-form/product-form.component'
 import { CustomFormsModule } from 'ng2-validation'
-
+import { ProductFilterComponent } from './products/product-filter/product-filter.component'
+import { ProductCardComponent } from './products/product-card/product-card.component'
+import { ShoppingCartService } from './shopping-cart.service';
+import { ProductQuantityComponent } from './product-quantity/product-quantity.component'
 @NgModule({
     declarations: [
         AppComponent,
@@ -46,6 +49,9 @@ import { CustomFormsModule } from 'ng2-validation'
         AdminProductsComponent,
         AdminOrdersComponent,
         ProductFormComponent,
+        ProductFilterComponent,
+        ProductCardComponent,
+        ProductQuantityComponent,
     ],
     imports: [
         BrowserModule,
@@ -58,7 +64,15 @@ import { CustomFormsModule } from 'ng2-validation'
         AngularFireAuthModule, // imports firebase/auth, only needed for auth features
     ],
 
-    providers: [AuthService, AuthGaurd, UserService, AdminAuthGaurd, CategoryService, ProductService],
+    providers: [
+        ShoppingCartService,
+        AuthService,
+        AuthGaurd,
+        UserService,
+        AdminAuthGaurd,
+        CategoryService,
+        ProductService,
+    ],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

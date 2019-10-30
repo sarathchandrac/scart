@@ -79,14 +79,6 @@
         </form>
     </div>
     <div class="col-md-6">
-        <div class="card" style="width: 18rem;" *ngIf="product.title">
-            <img [src]="imageUrl.value" class="card-img-top" />
-            <div class="card-body">
-                <h5 class="card-title">{{ title.value }}</h5>
-                <p class="card-text">
-                    {{ price.value | currency: 'INR':true }}
-                </p>
-            </div>
-        </div>
+        <product-card [product]="product"></product-card>
     </div>
 </div>

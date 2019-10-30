@@ -18,7 +18,7 @@ export class CategoryService {
             .snapshotChanges()
             .pipe(tap(console.log))
     }
-    getCategories() {
+    getAll() {
         // return this.afs.doc<Category>(`categories`).valueChanges()
         /*
         , {

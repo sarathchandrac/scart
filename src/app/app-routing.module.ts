@@ -14,7 +14,7 @@ import { MyOrdersComponent } from './my-orders/my-orders.component'
 import { AdminProductsComponent } from './admin/admin-products/admin-products.component'
 
 const routes: Routes = [
-    { path: '', component: HomeComponent },
+    { path: '', component: ProductsComponent },
     { path: 'login', component: LoginComponent },
     { path: 'products', component: ProductsComponent },
     { path: 'shopping-cart', component: ShoppingCartComponent },
