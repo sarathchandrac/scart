@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core'
 import { Product } from './../models/product'
 import { Cart } from './../models/cart'
 import { ShoppingCartService } from './../shopping-cart.service'
+import { Item } from './../models/item'
 
 @Component({
     selector: 'product-quantity',
@@ -9,18 +10,18 @@ import { ShoppingCartService } from './../shopping-cart.service'
     styleUrls: ['./product-quantity.component.css'],
 })
 export class ProductQuantityComponent implements OnInit {
-    @Input() product: Product
+    @Input() item: Item
     @Input('shopping-cart') shoppingCart: Cart
     constructor(private shoppingCartService: ShoppingCartService) {}
 
     ngOnInit() {}
     addToCart() {
-        this.shoppingCartService.addToCart(this.product)
+        this.shoppingCartService.addToCart(this.item)
     }
     removeFromCart() {
-        this.shoppingCartService.removeFromCart(this.product)
+        this.shoppingCartService.removeFromCart(this.item)
     }
     getQuantity(): number {
-        return this.shoppingCart.getQuantity(this.product)
+        return this.shoppingCart.getQuantity(this.item)
     }
 }

@@ -43,6 +43,7 @@ export class ShoppingCartService {
                         const data = item.payload.doc.data()
                         obj[item.payload.doc.id] = data
                     })
+                    // console.log('object returned -->', obj)
                     return new Cart(obj)
                 })
                 // map(item => {
@@ -57,19 +58,19 @@ export class ShoppingCartService {
     private getItem(cartId: string, productId: string): AngularFirestoreDocument<Item> {
         return this.afs.doc<Item>(`/shopping-carts/${cartId}/items/${productId}`)
     }
-    addToCart(product) {
-        this.updateCart(product, 1)
+    addToCart(item) {
+        this.updateCart(item, 1)
     }
-    removeFromCart(product) {
-        this.updateCart(product, -1)
+    removeFromCart(item) {
+        this.updateCart(item, -1)
     }
-    async updateCart(product: Product, change: number) {
+    async updateCart(item: Item, change: number) {
         let cartId = await this.getOrCreateCartId()
         console.log('cartId', cartId)
 
-        const product$ = this.getItem(cartId, product.id)
+        const item$ = this.getItem(cartId, item.$key)
         // const product$ = this.afs.doc<Product>(`/shopping-carts/${cartId}/items/${product.id}`).snapshotChanges()
-        product$
+        item$
             .snapshotChanges()
             .pipe(
                 take(1),
@@ -83,9 +84,14 @@ export class ShoppingCartService {
             .subscribe(p => {
                 const quantity = (p.quantity || 0) + change
                 if (p.exists) {
-                    product$.update({ quantity })
+                    item$.update({ quantity })
                 } else {
-                    product$.set({ product, quantity } as Item)
+                    item$.set({
+                        quantity,
+                        title: item.title,
+                        imageUrl: item.imageUrl,
+                        price: item.price,
+                    } as Item)
                 }
             })
     }

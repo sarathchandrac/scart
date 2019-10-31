@@ -2,10 +2,19 @@ import { Item } from './item'
 import { Product } from './product'
 export class Cart {
     items: Item[] = []
-    constructor(public itemsMap: { [productId: string]: Item }) {
-        for (let productId in itemsMap) {
-            const item = new Item(itemsMap[productId].product, itemsMap[productId].quantity)
-            this.items.push(item)
+    constructor(public itemsMap: { [itemId: string]: { quantity: number; product: Product } }) {
+        for (let itemId in itemsMap) {
+            const item = itemsMap[itemId]
+            const product = itemsMap[itemId].product
+            if (product) {
+                let newItem = new Item()
+                newItem.$key = itemId
+                newItem.quantity = item.quantity
+                newItem.title = product.title
+                newItem.price = product.price
+                newItem.imageUrl = product.imageUrl
+                this.items.push(newItem)
+            }
         }
     }
 
@@ -23,8 +32,8 @@ export class Cart {
         })
         return totalPrice
     }
-    getQuantity(product: Product): number {
-        let item = this.items.find(item => item.product.id === product.id)
+    getQuantity(product: Item): number {
+        let item = this.items.find(item => item.$key === product.$key)
         if (!item) return 0
         else return item.quantity
     }
