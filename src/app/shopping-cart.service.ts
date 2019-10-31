@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core'
-import { AngularFirestore, AngularFirestoreDocument, DocumentSnapshot, Action } from '@angular/fire/firestore'
+import {
+    AngularFirestore,
+    AngularFirestoreDocument,
+    AngularFirestoreCollection,
+    DocumentSnapshot,
+    Action,
+} from '@angular/fire/firestore'
 import { Product } from './models/product'
 import { Cart } from './models/cart'
 import { take, map, tap } from 'rxjs/operators'
@@ -19,16 +25,7 @@ export class ShoppingCartService {
             items: [], // Todo: remove
         })
     }
-    private async getOrCreateCartId() {
-        let cartId = localStorage.getItem('cartId')
-        if (cartId) return cartId
 
-        let result = await this.create()
-
-        //console.log('created a cart item--', result)
-        localStorage.setItem('cartId', result.id)
-        return result.id
-    }
     async getCart(): Promise<Observable<Cart>> {
         let cartId = await this.getOrCreateCartId()
         let cartRef = this.afs.doc<Cart>(`/shopping-carts/${cartId}`)
@@ -55,9 +52,7 @@ export class ShoppingCartService {
                 // tap(console.log)
             )
     }
-    private getItem(cartId: string, productId: string): AngularFirestoreDocument<Item> {
-        return this.afs.doc<Item>(`/shopping-carts/${cartId}/items/${productId}`)
-    }
+
     addToCart(item) {
         this.updateCart(item, 1)
     }
@@ -66,15 +61,19 @@ export class ShoppingCartService {
     }
     async updateCart(item: Item, change: number) {
         let cartId = await this.getOrCreateCartId()
-        console.log('cartId', cartId)
+        console.log('cartId', cartId, item)
+        const itemId = item.$key || item['id']
 
-        const item$ = this.getItem(cartId, item.$key)
+        const item$ = this.getItem(cartId, itemId) // itemId ? this.getItem(cartId, itemId) : this.getItems(cartId)
         // const product$ = this.afs.doc<Product>(`/shopping-carts/${cartId}/items/${product.id}`).snapshotChanges()
         item$
             .snapshotChanges()
             .pipe(
                 take(1),
                 map(action => {
+                    if (!action.payload) {
+                        return null
+                    }
                     const data = action.payload.data() as Item
                     const exists = action.payload.exists
                     const id = action.payload.id
@@ -84,7 +83,7 @@ export class ShoppingCartService {
             .subscribe(p => {
                 const quantity = (p.quantity || 0) + change
                 if (p.exists) {
-                    item$.update({ quantity })
+                    quantity === 0 ? item$.delete() : item$.update({ quantity })
                 } else {
                     item$.set({
                         quantity,
@@ -93,6 +92,36 @@ export class ShoppingCartService {
                         price: item.price,
                     } as Item)
                 }
+                // } else {
+
+                //     // item$.add({
+                //     //     quantity,
+                //     //     title: item.title,
+                //     //     imageUrl: item.imageUrl,
+                //     //     price: item.price,
+                //     // } as Item)
+                // }
             })
+    }
+    async clearCart() {
+        const cartId = await this.getOrCreateCartId()
+        return this.afs.collection<Item>(`/shopping-carts/${cartId}/items`)
+    }
+
+    private getItem(cartId: string, productId: string): AngularFirestoreDocument<Item> {
+        return this.afs.doc<Item>(`/shopping-carts/${cartId}/items/${productId}`)
+    }
+    private getItems(cartId: string): AngularFirestoreCollection<Item> {
+        return this.afs.collection<Item>(`/shopping-carts/${cartId}/items`)
+    }
+    private async getOrCreateCartId() {
+        let cartId = localStorage.getItem('cartId')
+        if (cartId) return cartId
+
+        let result = await this.create()
+
+        //console.log('created a cart item--', result)
+        localStorage.setItem('cartId', result.id)
+        return result.id
     }
 }
