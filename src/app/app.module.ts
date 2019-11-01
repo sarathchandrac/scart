@@ -31,8 +31,10 @@ import { ProductFormComponent } from './admin/product-form/product-form.componen
 import { CustomFormsModule } from 'ng2-validation'
 import { ProductFilterComponent } from './products/product-filter/product-filter.component'
 import { ProductCardComponent } from './products/product-card/product-card.component'
-import { ShoppingCartService } from './shopping-cart.service';
+import { ShoppingCartService } from './shopping-cart.service'
 import { ProductQuantityComponent } from './product-quantity/product-quantity.component'
+import { ShippingFormComponent } from './shipping-form/shipping-form.component'
+import { CartSummaryComponent } from './cart-summary/cart-summary.component'
 @NgModule({
     declarations: [
         AppComponent,
@@ -52,6 +54,8 @@ import { ProductQuantityComponent } from './product-quantity/product-quantity.co
         ProductFilterComponent,
         ProductCardComponent,
         ProductQuantityComponent,
+        ShippingFormComponent,
+        CartSummaryComponent,
     ],
     imports: [
         BrowserModule,

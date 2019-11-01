@@ -12,6 +12,7 @@ import { AdminOrdersComponent } from './admin/admin-orders/admin-orders.componen
 import { ShoppingCartComponent } from './shopping-cart/shopping-cart.component'
 import { MyOrdersComponent } from './my-orders/my-orders.component'
 import { AdminProductsComponent } from './admin/admin-products/admin-products.component'
+import { OrderSuccessComponent } from './order-success/order-success.component'
 
 const routes: Routes = [
     { path: '', component: ProductsComponent },
@@ -22,7 +23,7 @@ const routes: Routes = [
     { path: 'check-out', component: CheckOutComponent, canActivate: [AuthGaurd] },
     {
         path: 'order-success',
-        component: CheckOutComponent,
+        component: OrderSuccessComponent,
         canActivate: [AuthGaurd],
     },
     { path: 'my/orders', component: MyOrdersComponent, canActivate: [AuthGaurd] },

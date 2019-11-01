@@ -43,29 +43,23 @@ export class ShoppingCartService {
                     // console.log('object returned -->', obj)
                     return new Cart(obj)
                 })
-                // map(item => {
-                //     const Item = item.payload.doc.data() as Item
-                //     const id = item.payload.doc.data() as Item
-                //     // const list = items.map(item => ({item.product.id:{ quantity: item.quantity, product: item.product }}))
-                //     return new Cart({})
-                // })
-                // tap(console.log)
             )
     }
 
     addToCart(item) {
         this.updateCart(item, 1)
     }
+
     removeFromCart(item) {
         this.updateCart(item, -1)
     }
+
     async updateCart(item: Item, change: number) {
         let cartId = await this.getOrCreateCartId()
         console.log('cartId', cartId, item)
         const itemId = item.$key || item['id']
 
-        const item$ = this.getItem(cartId, itemId) // itemId ? this.getItem(cartId, itemId) : this.getItems(cartId)
-        // const product$ = this.afs.doc<Product>(`/shopping-carts/${cartId}/items/${product.id}`).snapshotChanges()
+        const item$ = this.getItem(cartId, itemId)
         item$
             .snapshotChanges()
             .pipe(
@@ -92,36 +86,50 @@ export class ShoppingCartService {
                         price: item.price,
                     } as Item)
                 }
-                // } else {
-
-                //     // item$.add({
-                //     //     quantity,
-                //     //     title: item.title,
-                //     //     imageUrl: item.imageUrl,
-                //     //     price: item.price,
-                //     // } as Item)
-                // }
             })
     }
+
     async clearCart() {
         const cartId = await this.getOrCreateCartId()
-        return this.afs.collection<Item>(`/shopping-carts/${cartId}/items`)
+        console.log('clear cart', cartId)
+        const cartItems$ = this.getItems(cartId)
+        cartItems$
+            .snapshotChanges()
+            .pipe(
+                take(1),
+                tap(console.log)
+            )
+            .subscribe(items => {
+                items.forEach(item => {
+                    const data = item.payload.doc.data()
+                    const itemId = item.payload.doc.id
+                    this.deleteItem(cartId, itemId)
+                })
+            })
     }
 
-    private getItem(cartId: string, productId: string): AngularFirestoreDocument<Item> {
-        return this.afs.doc<Item>(`/shopping-carts/${cartId}/items/${productId}`)
-    }
-    private getItems(cartId: string): AngularFirestoreCollection<Item> {
-        return this.afs.collection<Item>(`/shopping-carts/${cartId}/items`)
-    }
     private async getOrCreateCartId() {
         let cartId = localStorage.getItem('cartId')
         if (cartId) return cartId
 
         let result = await this.create()
 
-        //console.log('created a cart item--', result)
         localStorage.setItem('cartId', result.id)
         return result.id
+    }
+
+    private getItem(cartId: string, productId: string): AngularFirestoreDocument<Item> {
+        return this.afs.doc<Item>(`/shopping-carts/${cartId}/items/${productId}`)
+    }
+
+    private getItems(cartId: string): AngularFirestoreCollection<Item> {
+        return this.afs.collection<Item>(`/shopping-carts/${cartId}/items`)
+    }
+
+    private deleteItem(cartId: string, itemId: string) {
+        const item$ = this.getItem(cartId, itemId)
+        item$.delete().then(result => {
+            console.log('deleted', result)
+        })
     }
 }
